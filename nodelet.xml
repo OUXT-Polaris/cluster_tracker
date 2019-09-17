@@ -1,0 +1,7 @@
+<library path="lib/libcluster_tracker">
+    <class name="cluster_tracker/ClusterTracker" type="cluster_tracker::ClusterTracker" base_class_type="nodelet::Nodelet">
+      <description>
+        ClusterTracker tracks tracking euclidean clustering
+      </description>
+    </class>
+  </library>
