@@ -37,7 +37,7 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-add_library(cluster_tracker src/cluster_tracker.cpp)
+add_library(cluster_tracker src/cluster_tracker.cpp src/tracking_manager.cpp)
 target_link_libraries(cluster_tracker ${catkin_LIBRARIES})
 class_loader_hide_library_symbols(cluster_tracker)
 
