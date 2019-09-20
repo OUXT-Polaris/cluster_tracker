@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   tf2_geometry_msgs
   hungarian_solver
+  quaternion_operation
 )
 
 generate_dynamic_reconfigure_options(

@@ -17,6 +17,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/transform_datatypes.h>
 #include <pcl_ros/transforms.h>
+#include <quaternion_operation/quaternion_operation.h>
 
 // Headers in this package
 #include <cluster_tracker/ClusterTrackerConfig.h>
@@ -24,16 +25,6 @@
 // Headers in PCL
 #include <pcl/search/pcl_search.h>
 #include <pcl/common/transforms.h>
-#include <pcl/tracking/tracking.h>
-#include <pcl/tracking/particle_filter.h>
-#include <pcl/tracking/kld_adaptive_particle_filter_omp.h>
-#include <pcl/tracking/particle_filter_omp.h>
-#include <pcl/tracking/coherence.h>
-#include <pcl/tracking/distance_coherence.h>
-#include <pcl/tracking/hsv_color_coherence.h>
-#include <pcl/tracking/approx_nearest_pair_point_cloud_coherence.h>
-#include <pcl/tracking/nearest_pair_point_cloud_coherence.h>
-#include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
 #include <pcl/console/parse.h>
@@ -41,6 +32,7 @@
 #include <pcl/common/centroid.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/crop_box.h>
 #include <pcl/filters/approximate_voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
 
