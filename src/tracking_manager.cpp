@@ -4,7 +4,7 @@ namespace cluster_tracker
 {
     TrackingManager::TrackingManager(int num_tracking_threads)
     {
-
+        num_tracking_threads_ = num_tracking_threads;
     }
 
     TrackingManager::~TrackingManager()
@@ -12,7 +12,13 @@ namespace cluster_tracker
 
     }
 
-    void TrackingManager::addClusterClouds(std::vector<pcl::PCLPointCloud2> cluster_clouds,std::vector<vision_msgs::Detection3D> detections)
+    void TrackingManager::updateConfig(cluster_tracker::ClusterTrackerConfig config)
+    {
+        config_ = config;
+        return;
+    }
+
+    void TrackingManager::addNewDetections(std::vector<pcl::PCLPointCloud2> cluster_clouds,std::vector<vision_msgs::Detection3D> detections)
     {
         std::vector<pcl::PointCloud<RefPointType> > clouds;
         for(auto cluster_clouds_itr = cluster_clouds.begin(); cluster_clouds_itr != cluster_clouds.end(); cluster_clouds_itr++)
@@ -21,11 +27,22 @@ namespace cluster_tracker
             pcl::fromPCLPointCloud2(*cluster_clouds_itr,*temp_cloud);
             clouds.push_back(*temp_cloud);
         }
-        addClusterClouds(clouds,detections);
+        assignTracker(clouds,detections);
+        return;
     }
 
-    void TrackingManager::addClusterClouds(std::vector<pcl::PointCloud<RefPointType> > cluster_clouds,std::vector<vision_msgs::Detection3D> detections)
+    void TrackingManager::assignTracker(std::vector<pcl::PointCloud<RefPointType> > cluster_clouds,std::vector<vision_msgs::Detection3D> detections)
     {
-
+        ROS_ASSERT(cluster_clouds.size() == detections.size());
+        if(tracker_ptrs_.size() == 0)
+        {
+            for(int i=0; i<cluster_clouds.size(); i++)
+            {
+                std::shared_ptr<cluster_tracker::TrackerInstance> tracker_ptr = 
+                    std::make_shared<cluster_tracker::TrackerInstance>(num_tracking_threads_);
+                tracker_ptrs_.push_back(tracker_ptr);
+            }
+        }
+        return;
     }
 }

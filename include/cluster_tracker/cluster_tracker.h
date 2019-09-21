@@ -19,6 +19,7 @@
 #include <pcl_ros/transforms.h>
 #include <quaternion_operation/quaternion_operation.h>
 #include <hungarian_solver/hungarian_solver.h>
+#include <jsk_rviz_plugins/OverlayText.h>
 
 // Headers in this package
 #include <cluster_tracker/ClusterTrackerConfig.h>
@@ -49,6 +50,9 @@
 #include <pcl/point_cloud.h>
 #include <pcl/features/moment_of_inertia_estimation.h>
 
+// Headers in this package
+#include <cluster_tracker/tracker_instance.h>
+
 namespace cluster_tracker
 {
     typedef message_filters::sync_policies::ApproximateTime<vision_msgs::Detection3DArray,sensor_msgs::PointCloud2> SyncPolicy;
@@ -70,11 +74,12 @@ namespace cluster_tracker
         std::shared_ptr<message_filters::Synchronizer<SyncPolicy> > sync_ptr_;
         tf2_ros::Buffer tf_buffer_;
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_ptr_;
-        pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr tracker_ptr_;
         std::string robot_frame_;
         int num_tracking_threads_;
         hungarian_solver::Solver solver_;
         std::shared_ptr<cluster_tracker::TrackingManager> manager_ptr_;
+        ros::Publisher tracking_status_pub_;
+        jsk_rviz_plugins::OverlayText generateStatusText();
     };
 }
 

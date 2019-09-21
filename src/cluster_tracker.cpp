@@ -9,9 +9,8 @@ namespace cluster_tracker
         pnh_ = getPrivateNodeHandle();
         pnh_.param<std::string>("robot_frame", robot_frame_, "base_link");
         pnh_.param<int>("num_tracking_threads", num_tracking_threads_, 8);
-        tracker_ptr_ = pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr
-            (new pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT> (num_tracking_threads_));
-            
+        manager_ptr_ = std::make_shared<cluster_tracker::TrackingManager>(num_tracking_threads_);
+        tracking_status_pub_ = pnh_.advertise<jsk_rviz_plugins::OverlayText>("tracking_status",1);
         cluster_bbox_sub_ptr_ = std::make_shared<message_filters::Subscriber<vision_msgs::Detection3DArray> >(pnh_, "input/cluster_bbox", 10);
         pointcloud_sub_ptr_ = std::make_shared<message_filters::Subscriber<sensor_msgs::PointCloud2> >(pnh_, "input/pointcloud", 10);
         param_func_ = boost::bind(&ClusterTracker::paramsCallback, this, _1, _2);
@@ -24,6 +23,7 @@ namespace cluster_tracker
     void ClusterTracker::paramsCallback(cluster_tracker::ClusterTrackerConfig &config, uint32_t level)
     {
         config_ = config;
+        manager_ptr_->updateConfig(config_);
         return;
     }
 
@@ -62,8 +62,34 @@ namespace cluster_tracker
             cluster_clouds.push_back(*pcl_cloud_ptr);
             detections.push_back(*itr);
         }
-        manager_ptr_->addClusterClouds(cluster_clouds,detections);
+        manager_ptr_->addNewDetections(cluster_clouds,detections);
+
+        jsk_rviz_plugins::OverlayText status_text = generateStatusText();
+        tracking_status_pub_.publish(status_text);
+
         return;
+    }
+
+    jsk_rviz_plugins::OverlayText ClusterTracker::generateStatusText()
+    {
+        jsk_rviz_plugins::OverlayText status_text;
+        status_text.action = jsk_rviz_plugins::OverlayText::ADD;
+        status_text.width = 320;
+        status_text.height = 320;
+        status_text.left = 0;
+        status_text.top = 0;
+        status_text.bg_color.r = 0.0;
+        status_text.bg_color.g = 0.0;
+        status_text.bg_color.b = 0.0;
+        status_text.bg_color.a = 0.8;
+        status_text.line_width = 10;
+        status_text.text_size = 10;
+        status_text.fg_color.r = 0.2;
+        status_text.fg_color.g = 0.2;
+        status_text.fg_color.b = 0.8;
+        status_text.fg_color.a = 0.8;
+        status_text.text = "Tracking Status\n Objects:" + std::to_string(manager_ptr_->getNumberOfTrackingObjects());
+        return status_text;
     }
 }
 

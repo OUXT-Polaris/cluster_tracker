@@ -17,21 +17,37 @@
 #include <pcl/point_cloud.h>
 #include <pcl/features/moment_of_inertia_estimation.h>
 
+// Headers in Boost
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/assign/list_of.hpp>
+
+// Headers in this package
+#include <cluster_tracker/tracker_instance.h>
+#include <cluster_tracker/ClusterTrackerConfig.h>
+
 namespace cluster_tracker
 {
     typedef pcl::PointXYZI RefPointType;
-    typedef pcl::tracking::ParticleXYZRPY ParticleT;
-    typedef pcl::tracking::ParticleFilterTracker<pcl::PCLPointCloud2, ParticleT> ParticleFilter;
+
     class TrackingManager
     {
     public:
         TrackingManager(int num_tracking_threads);
         ~TrackingManager();
-        void addClusterClouds(std::vector<pcl::PCLPointCloud2> cluster_clouds,std::vector<vision_msgs::Detection3D> detections);
-        void addClusterClouds(std::vector<pcl::PointCloud<RefPointType> > cluster_clouds,std::vector<vision_msgs::Detection3D> detections);
+        void addNewDetections(std::vector<pcl::PCLPointCloud2> cluster_clouds,std::vector<vision_msgs::Detection3D> detections);
+        void updateConfig(cluster_tracker::ClusterTrackerConfig config);
+        int getNumberOfTrackingObjects()
+        {
+            return (int)tracker_ptrs_.size();
+        }
     private:
-        std::vector<pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr> tracker_ptrs_;
-        void addNewDetection(pcl::PointCloud<RefPointType> detction_cloud,vision_msgs::Detection3D detection);
+        void assignTracker(std::vector<pcl::PointCloud<RefPointType> > cluster_clouds,std::vector<vision_msgs::Detection3D> detections);
+        int num_tracking_threads_;
+        std::vector<std::shared_ptr<cluster_tracker::TrackerInstance> > tracker_ptrs_;
+        cluster_tracker::ClusterTrackerConfig config_;
     };
 }
 
