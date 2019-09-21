@@ -18,9 +18,11 @@
 #include <tf2/transform_datatypes.h>
 #include <pcl_ros/transforms.h>
 #include <quaternion_operation/quaternion_operation.h>
+#include <hungarian_solver/hungarian_solver.h>
 
 // Headers in this package
 #include <cluster_tracker/ClusterTrackerConfig.h>
+#include <cluster_tracker/tracking_manager.h>
 
 // Headers in PCL
 #include <pcl/search/pcl_search.h>
@@ -35,6 +37,17 @@
 #include <pcl/filters/crop_box.h>
 #include <pcl/filters/approximate_voxel_grid.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <pcl/tracking/tracking.h>
+#include <pcl/tracking/particle_filter.h>
+#include <pcl/tracking/kld_adaptive_particle_filter_omp.h>
+#include <pcl/tracking/particle_filter_omp.h>
+#include <pcl/tracking/coherence.h>
+#include <pcl/tracking/distance_coherence.h>
+#include <pcl/tracking/hsv_color_coherence.h>
+#include <pcl/tracking/approx_nearest_pair_point_cloud_coherence.h>
+#include <pcl/tracking/nearest_pair_point_cloud_coherence.h>
+#include <pcl/point_cloud.h>
+#include <pcl/features/moment_of_inertia_estimation.h>
 
 namespace cluster_tracker
 {
@@ -57,7 +70,11 @@ namespace cluster_tracker
         std::shared_ptr<message_filters::Synchronizer<SyncPolicy> > sync_ptr_;
         tf2_ros::Buffer tf_buffer_;
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_ptr_;
+        pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr tracker_ptr_;
         std::string robot_frame_;
+        int num_tracking_threads_;
+        hungarian_solver::Solver solver_;
+        std::shared_ptr<cluster_tracker::TrackingManager> manager_ptr_;
     };
 }
 

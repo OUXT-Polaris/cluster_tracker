@@ -30,20 +30,26 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
+find_package(PCL REQUIRED COMPONENTS tracking)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
+  ${PCL_INCLUDE_DIRS}
 )
 
+link_directories(${PCL_LIBRARY_DIRS})
+
 add_library(cluster_tracker src/cluster_tracker.cpp src/tracking_manager.cpp)
-target_link_libraries(cluster_tracker ${catkin_LIBRARIES})
+target_link_libraries(cluster_tracker ${catkin_LIBRARIES} ${PCL_TRACKING_LIBRARIES})
 class_loader_hide_library_symbols(cluster_tracker)
+add_dependencies(cluster_tracker ${catkin_EXPORTED_TARGETS})
 
 add_executable(cluster_tracker_node src/cluster_tracker_node.cpp)
 target_link_libraries(cluster_tracker_node ${catkin_LIBRARIES})
+add_dependencies(cluster_tracker_node ${catkin_EXPORTED_TARGETS})
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
