@@ -5,11 +5,13 @@ namespace cluster_tracker
 {
     TrackerInstance::TrackerInstance(int num_tracking_threads,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection)
     {
+        tracking_results_ = boost::circular_buffer<vision_msgs::Detection3D>(10);
         // transform pointcloud
         Eigen::Vector4f c;
         Eigen::Affine3f trans = Eigen::Affine3f::Identity();
         pcl::compute3DCentroid<RefPointType>(cluster, c);
         trans.translation().matrix() = Eigen::Vector3f (c[0],c[1],c[2]);
+        model_ = pcl::PointCloud<RefPointType>::Ptr(new pcl::PointCloud<RefPointType>);
         pcl::transformPointCloud<RefPointType>(cluster,*model_,trans.inverse());
 
         // building model
@@ -34,6 +36,15 @@ namespace cluster_tracker
         tracker_.setInitialNoiseMean(default_initial_mean);
         tracker_.setResampleLikelihoodThr(0.00);
         tracker_.setUseNormal(false);
+        pcl::tracking::ApproxNearestPairPointCloudCoherence<RefPointType>::Ptr coherence(new pcl::tracking::ApproxNearestPairPointCloudCoherence<RefPointType>);
+        pcl::tracking::DistanceCoherence<RefPointType>::Ptr distance_coherence(new pcl::tracking::DistanceCoherence<RefPointType>);
+        coherence->addPointCoherence(distance_coherence);
+        pcl::search::Octree<RefPointType>::Ptr search(new pcl::search::Octree<RefPointType>(0.01));
+        coherence->setSearchMethod(search);
+        coherence->setMaximumDistance(0.01);
+        tracker_.setCloudCoherence(coherence);
+        tracker_.setReferenceCloud(model_);
+        tracker_.setTrans(trans);
     }
 
     TrackerInstance::~TrackerInstance()

@@ -53,6 +53,7 @@ namespace cluster_tracker
         double getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1);
         cluster_tracker::ClusterTrackerConfig config_;
         pcl::PointCloud<RefPointType>::Ptr model_;
+        boost::circular_buffer<vision_msgs::Detection3D> tracking_results_;
     };
 }
 

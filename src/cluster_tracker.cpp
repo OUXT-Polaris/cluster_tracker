@@ -50,11 +50,6 @@ namespace cluster_tracker
             geometry_msgs::Vector3 rot_vec = quaternion_operation::convertQuaternionToEulerAngle(itr->bbox.center.orientation);
             rotation << rot_vec.x, rot_vec.y, rot_vec.z;
             crop_box.setRotation(rotation);
-            Eigen::Vector4f min_point, max_point;
-            min_point << itr->bbox.size.x*-0.5,itr->bbox.size.y*-0.5,itr->bbox.size.z*-0.5,0.0;
-            crop_box.setMin(min_point);
-            max_point << itr->bbox.size.x*0.5,itr->bbox.size.y*0.5,itr->bbox.size.z*0.5,0.0;
-            crop_box.setMax(max_point);
             crop_box.filter(*pcl_cloud_ptr);
             cluster_clouds.push_back(*pcl_cloud_ptr);
             detections.push_back(*itr);
