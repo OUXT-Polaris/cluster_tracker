@@ -58,9 +58,23 @@ namespace cluster_tracker
         return;
     }
 
-    void TrackerInstance::trackObject(pcl::PCLPointCloud2::Ptr cloud,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection)
+    void TrackerInstance::trackObject(pcl::PCLPointCloud2::Ptr cloud)
     {
         return;
+    }
+
+    boost::optional<double> TrackerInstance::getBboxMatchingCost(pcl::PointCloud<RefPointType> cluster,vision_msgs::Detection3D detection)
+    {
+        double ret;
+        return ret;
+    }
+
+    double TrackerInstance::getPointCloudMatchingCost(pcl::PointCloud<RefPointType> pc0, pcl::PointCloud<RefPointType> pc1)
+    {
+        pcl::SegmentDifferences<pcl::PointCloud<RefPointType> > impl_;
+        impl_.setDistanceThreshold(config_.pointcloud_distance_threashold);
+        //impl_.setInputCloud(pc0);
+        //impl_.setTargetCloud(pc1);
     }
 
     double TrackerInstance::getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1)

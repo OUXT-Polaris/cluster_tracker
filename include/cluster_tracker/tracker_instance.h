@@ -28,9 +28,11 @@
 #include <pcl/tracking/nearest_pair_point_cloud_coherence.h>
 #include <pcl/point_cloud.h>
 #include <pcl/features/moment_of_inertia_estimation.h>
+#include <pcl/segmentation/segment_differences.h>
 
 // Headers in Boost
 #include <boost/circular_buffer.hpp>
+#include <boost/optional.hpp>
 
 // Headers in this package
 #include <cluster_tracker/ClusterTrackerConfig.h>
@@ -47,9 +49,11 @@ namespace cluster_tracker
         TrackerInstance(int num_tracking_threads,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection);
         ~TrackerInstance();
         void updateConfig(cluster_tracker::ClusterTrackerConfig config);
-        void trackObject(pcl::PCLPointCloud2::Ptr cloud,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection);
+        boost::optional<double> getBboxMatchingCost(pcl::PointCloud<RefPointType> cluster,vision_msgs::Detection3D detection);
+        void trackObject(pcl::PCLPointCloud2::Ptr cloud);
     private:
         ParticleFilter tracker_;
+        double getPointCloudMatchingCost(pcl::PointCloud<RefPointType> pc0, pcl::PointCloud<RefPointType> pc1);
         double getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1);
         cluster_tracker::ClusterTrackerConfig config_;
         pcl::PointCloud<RefPointType>::Ptr model_;
