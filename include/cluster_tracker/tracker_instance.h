@@ -2,7 +2,7 @@
 #define CLUSTER_TRACKER_TRACKER_INSTANCE_H_INCLUDED
 
 // Headers in ROS
-#include <vision_msgs/BoundingBox3D.h>
+#include <vision_msgs/Detection3D.h>
 
 // Headers in PCL
 #include <pcl/search/pcl_search.h>
@@ -37,21 +37,22 @@
 
 namespace cluster_tracker
 {
-    typedef pcl::PointXYZI RefPointType;
+    typedef pcl::PointXYZ RefPointType;
     typedef pcl::tracking::ParticleXYZRPY ParticleT;
-    typedef pcl::tracking::ParticleFilterTracker<pcl::PCLPointCloud2, ParticleT> ParticleFilter;
+    typedef pcl::tracking::ParticleFilterTracker<RefPointType, ParticleT> ParticleFilter;
     
     class TrackerInstance
     {
     public:
-        TrackerInstance();
-        TrackerInstance(int num_tracking_threads);
+        TrackerInstance(int num_tracking_threads,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection);
         ~TrackerInstance();
         void updateConfig(cluster_tracker::ClusterTrackerConfig config);
+        void trackObject(pcl::PCLPointCloud2::Ptr cloud,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection);
     private:
-        pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr tracker_ptr_;
+        ParticleFilter tracker_;
         double getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1);
         cluster_tracker::ClusterTrackerConfig config_;
+        pcl::PointCloud<RefPointType>::Ptr model_;
     };
 }
 

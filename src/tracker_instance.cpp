@@ -3,16 +3,37 @@
 
 namespace cluster_tracker
 {
-    TrackerInstance::TrackerInstance(int num_tracking_threads)
+    TrackerInstance::TrackerInstance(int num_tracking_threads,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection)
     {
-        tracker_ptr_ = pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr
-            (new pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT> (num_tracking_threads));
-    }
+        // transform pointcloud
+        Eigen::Vector4f c;
+        Eigen::Affine3f trans = Eigen::Affine3f::Identity();
+        pcl::compute3DCentroid<RefPointType>(cluster, c);
+        trans.translation().matrix() = Eigen::Vector3f (c[0],c[1],c[2]);
+        pcl::transformPointCloud<RefPointType>(cluster,*model_,trans.inverse());
 
-    TrackerInstance::TrackerInstance()
-    {
-        tracker_ptr_ = pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT>::Ptr
-            (new pcl::tracking::KLDAdaptiveParticleFilterOMPTracker<RefPointType, ParticleT> (8));
+        // building model
+        pcl::ApproximateVoxelGrid<RefPointType> grid;
+        grid.setLeafSize(static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size));
+        grid.setInputCloud(model_);
+        grid.filter(*model_);
+
+        // initialize tracker
+        tracker_.setParticleNum(config_.maximum_particle_num);
+        tracker_.setIterationNum(config_.inetration_num);
+        tracker_.setTrans(Eigen::Affine3f::Identity());
+        std::vector<double> default_step_covariance = std::vector<double> (6, config_.step_covariance_xyz);
+        default_step_covariance[3] = config_.step_covariance_rpy;
+        default_step_covariance[4] = config_.step_covariance_rpy;
+        default_step_covariance[5] = config_.step_covariance_rpy;
+        std::vector<double> initial_noise_covariance = std::vector<double>(6, 0.00001);
+        std::vector<double> default_initial_mean = std::vector<double>(6, 0.0);
+        tracker_.setInitialNoiseCovariance(initial_noise_covariance);
+        tracker_.setInitialNoiseMean(default_initial_mean);
+        tracker_.setResampleLikelihoodThr(0.00);
+        tracker_.setUseNormal(false);
     }
 
     TrackerInstance::~TrackerInstance()
@@ -23,6 +44,12 @@ namespace cluster_tracker
     void TrackerInstance::updateConfig(cluster_tracker::ClusterTrackerConfig config)
     {
         config_ = config;
+        return;
+    }
+
+    void TrackerInstance::trackObject(pcl::PCLPointCloud2::Ptr cloud,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection)
+    {
+        return;
     }
 
     double TrackerInstance::getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1)

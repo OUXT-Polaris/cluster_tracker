@@ -31,6 +31,8 @@ namespace cluster_tracker
     {
         std::vector<pcl::PCLPointCloud2> cluster_clouds;
         std::vector<vision_msgs::Detection3D> detections;
+        pcl::PCLPointCloud2::Ptr pcl_cloud_ptr(new pcl::PCLPointCloud2);
+        pcl_conversions::toPCL(*cloud,*(pcl_cloud_ptr));
         ROS_ASSERT(cloud->header.frame_id == robot_frame_);
         for(auto itr=cluster->detections.begin(); itr!=cluster->detections.end(); itr++)
         {
@@ -39,11 +41,6 @@ namespace cluster_tracker
         ROS_ASSERT(cluster->header.frame_id == robot_frame_);
         for(auto itr=cluster->detections.begin(); itr!=cluster->detections.end(); itr++)
         {
-            sensor_msgs::PointCloud2 cloud_transformed;
-            pcl::PCLPointCloud2::Ptr pcl_cloud_ptr(new pcl::PCLPointCloud2);
-            cloud_transformed = *cloud;
-            pcl_conversions::toPCL(cloud_transformed,*(pcl_cloud_ptr));
-
             pcl::CropBox<pcl::PCLPointCloud2> crop_box;
             crop_box.setInputCloud(pcl_cloud_ptr);
             Eigen::Vector3f translation;
@@ -62,7 +59,7 @@ namespace cluster_tracker
             cluster_clouds.push_back(*pcl_cloud_ptr);
             detections.push_back(*itr);
         }
-        manager_ptr_->addNewDetections(cluster_clouds,detections);
+        manager_ptr_->addNewDetections(cluster_clouds,detections,pcl_cloud_ptr);
 
         jsk_rviz_plugins::OverlayText status_text = generateStatusText();
         tracking_status_pub_.publish(status_text);

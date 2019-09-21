@@ -42,14 +42,15 @@ include_directories(
 )
 
 link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 add_library(cluster_tracker src/cluster_tracker.cpp src/tracker_instance.cpp src/tracking_manager.cpp)
-target_link_libraries(cluster_tracker ${catkin_LIBRARIES} ${PCL_TRACKING_LIBRARIES})
+target_link_libraries(cluster_tracker ${catkin_LIBRARIES} ${PCL_TRACKING_LIBRARIES} ${PCL_LIBRARIES})
 class_loader_hide_library_symbols(cluster_tracker)
 add_dependencies(cluster_tracker ${catkin_EXPORTED_TARGETS})
 
 add_executable(cluster_tracker_node src/cluster_tracker_node.cpp)
-target_link_libraries(cluster_tracker_node ${catkin_LIBRARIES})
+target_link_libraries(cluster_tracker_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_dependencies(cluster_tracker_node ${catkin_EXPORTED_TARGETS})
 
 install(DIRECTORY include/${PROJECT_NAME}/
