@@ -18,7 +18,6 @@
 #include <tf2/transform_datatypes.h>
 #include <pcl_ros/transforms.h>
 #include <quaternion_operation/quaternion_operation.h>
-#include <hungarian_solver/hungarian_solver.h>
 #include <jsk_rviz_plugins/OverlayText.h>
 
 // Headers in this package
@@ -76,7 +75,6 @@ namespace cluster_tracker
         std::shared_ptr<tf2_ros::TransformListener> tf_listener_ptr_;
         std::string robot_frame_;
         int num_tracking_threads_;
-        hungarian_solver::Solver solver_;
         std::shared_ptr<cluster_tracker::TrackingManager> manager_ptr_;
         ros::Publisher tracking_status_pub_;
         jsk_rviz_plugins::OverlayText generateStatusText();

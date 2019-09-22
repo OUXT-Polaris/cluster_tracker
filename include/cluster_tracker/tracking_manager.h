@@ -3,6 +3,7 @@
 
 // Headers in ROS
 #include <vision_msgs/Detection3D.h>
+#include <hungarian_solver/hungarian_solver.h>
 
 // Headers in PCL
 #include <pcl/tracking/tracking.h>
@@ -49,6 +50,18 @@ namespace cluster_tracker
         int num_tracking_threads_;
         std::vector<std::shared_ptr<cluster_tracker::TrackerInstance> > tracker_ptrs_;
         cluster_tracker::ClusterTrackerConfig config_;
+        hungarian_solver::Solver solver_;
+        bool isMatched(int detection_index,int tracker_index,std::vector<std::pair<int,int> > match)
+        {
+            for(auto itr=match.begin(); itr!=match.end(); itr++)
+            {
+                if(itr->first==detection_index && itr->second==tracker_index)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     };
 }
 

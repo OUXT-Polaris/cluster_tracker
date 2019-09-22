@@ -59,6 +59,25 @@ namespace cluster_tracker
         return;
     }
 
+    void TrackerInstance::updateModel(pcl::PointCloud<RefPointType> cluster)
+    {
+        // transform pointcloud
+        Eigen::Vector4f c;
+        Eigen::Affine3f trans = Eigen::Affine3f::Identity();
+        pcl::compute3DCentroid<RefPointType>(cluster, c);
+        trans.translation().matrix() = Eigen::Vector3f (c[0],c[1],c[2]);
+        model_ = pcl::PointCloud<RefPointType>::Ptr(new pcl::PointCloud<RefPointType>);
+        pcl::transformPointCloud<RefPointType>(cluster,*model_,trans.inverse());
+        // building model
+        pcl::ApproximateVoxelGrid<RefPointType> grid;
+        grid.setLeafSize(static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size));
+        grid.setInputCloud(model_);
+        grid.filter(*model_);
+        return;
+    }
+
     void TrackerInstance::trackObject(pcl::PointCloud<RefPointType>::Ptr cloud)
     {
         pcl::ApproximateVoxelGrid<RefPointType> grid;
