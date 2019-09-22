@@ -71,10 +71,23 @@ namespace cluster_tracker
 
     double TrackerInstance::getPointCloudMatchingCost(pcl::PointCloud<RefPointType> pc0, pcl::PointCloud<RefPointType> pc1)
     {
-        pcl::SegmentDifferences<pcl::PointCloud<RefPointType> > impl_;
-        impl_.setDistanceThreshold(config_.pointcloud_distance_threashold);
-        //impl_.setInputCloud(pc0);
-        //impl_.setTargetCloud(pc1);
+        if(pc0.points.size() == 0 || pc1.points.size() == 0)
+        {
+            return 1.0;
+        }
+        pcl::SegmentDifferences<RefPointType> impl_;
+        pcl::PointCloud<RefPointType>::ConstPtr pc0_ptr(&pc0);
+        pcl::PointCloud<RefPointType>::ConstPtr pc1_ptr(&pc1);
+        impl_.setInputCloud(pc0_ptr);
+        impl_.setTargetCloud(pc1_ptr);
+        pcl::PointCloud<RefPointType> output_pc0;
+        impl_.segment(output_pc0);
+        impl_.setInputCloud(pc1_ptr);
+        impl_.setTargetCloud(pc0_ptr);
+        pcl::PointCloud<RefPointType> output_pc1;
+        impl_.segment(output_pc1);
+        double ratio = 1.0-((double)output_pc0.points.size()/(double)pc0_ptr->points.size()+(double)output_pc1.points.size()/(double)pc1_ptr->points.size())*0.5;
+        return ratio;
     }
 
     double TrackerInstance::getBboxMatchingCost(vision_msgs::BoundingBox3D bbox0, vision_msgs::BoundingBox3D bbox1)

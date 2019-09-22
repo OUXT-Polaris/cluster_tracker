@@ -31,7 +31,7 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-find_package(PCL REQUIRED COMPONENTS tracking)
+find_package(PCL REQUIRED COMPONENTS core features filters tracking segmentation)
 find_package(Eigen3 REQUIRED)
 
 include_directories(
@@ -45,7 +45,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 add_library(cluster_tracker src/cluster_tracker.cpp src/tracker_instance.cpp src/tracking_manager.cpp)
-target_link_libraries(cluster_tracker ${catkin_LIBRARIES} ${PCL_TRACKING_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries(cluster_tracker ${catkin_LIBRARIES} ${PCL_TRACKING_LIBRARIES} ${PCL_SEGMENTATION_LIBRARIES} ${PCL_LIBRARIES})
 class_loader_hide_library_symbols(cluster_tracker)
 add_dependencies(cluster_tracker ${catkin_EXPORTED_TARGETS})
 
