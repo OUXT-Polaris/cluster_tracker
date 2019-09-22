@@ -24,7 +24,7 @@ namespace cluster_tracker
         grid.filter(*model_);
 
         // initialize tracker
-        tracker_.setParticleNum(config_.maximum_particle_num);
+        tracker_.setParticleNum(config_.particle_num);
         tracker_.setIterationNum(config_.inetration_num);
         tracker_.setTrans(Eigen::Affine3f::Identity());
         std::vector<double> default_step_covariance = std::vector<double> (6, config_.step_covariance_xyz);
@@ -97,7 +97,7 @@ namespace cluster_tracker
 
     boost::optional<double> TrackerInstance::getBboxMatchingCost(pcl::PointCloud<RefPointType> cluster,vision_msgs::Detection3D detection)
     {
-        ROS_ASSERT(tracking_results_.size() == tracking_clouds_.size());
+        //ROS_ASSERT(tracking_results_.size() == tracking_clouds_.size());
         if(tracking_results_.size()==0)
         {
             return boost::none;

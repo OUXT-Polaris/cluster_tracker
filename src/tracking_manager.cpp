@@ -32,6 +32,7 @@ namespace cluster_tracker
 
     void TrackingManager::addNewDetections(std::vector<pcl::PCLPointCloud2> cluster_clouds,std::vector<vision_msgs::Detection3D> detections,pcl::PCLPointCloud2::Ptr whole_input_cloud)
     {
+        trackObject(whole_input_cloud);
         std::vector<pcl::PointCloud<RefPointType> > clouds;
         for(auto cluster_clouds_itr = cluster_clouds.begin(); cluster_clouds_itr != cluster_clouds.end(); cluster_clouds_itr++)
         {
