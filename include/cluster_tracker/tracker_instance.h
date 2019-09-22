@@ -50,7 +50,7 @@ namespace cluster_tracker
         ~TrackerInstance();
         void updateConfig(cluster_tracker::ClusterTrackerConfig config);
         boost::optional<double> getBboxMatchingCost(pcl::PointCloud<RefPointType> cluster,vision_msgs::Detection3D detection);
-        void trackObject(pcl::PCLPointCloud2::Ptr cloud);
+        void trackObject(pcl::PointCloud<RefPointType>::Ptr cloud);
     private:
         ParticleFilter tracker_;
         double getPointCloudMatchingCost(pcl::PointCloud<RefPointType> pc0, pcl::PointCloud<RefPointType> pc1);
@@ -58,6 +58,7 @@ namespace cluster_tracker
         cluster_tracker::ClusterTrackerConfig config_;
         pcl::PointCloud<RefPointType>::Ptr model_;
         boost::circular_buffer<vision_msgs::Detection3D> tracking_results_;
+        boost::circular_buffer<pcl::PointCloud<RefPointType>::Ptr> tracking_clouds_;
     };
 }
 

@@ -44,7 +44,7 @@ namespace cluster_tracker
             return (int)tracker_ptrs_.size();
         }
     private:
-        void trackObject();
+        void trackObject(pcl::PCLPointCloud2::Ptr whole_input_cloud);
         void assignTracker(std::vector<pcl::PointCloud<RefPointType> > cluster_clouds,std::vector<vision_msgs::Detection3D> detections);
         int num_tracking_threads_;
         std::vector<std::shared_ptr<cluster_tracker::TrackerInstance> > tracker_ptrs_;

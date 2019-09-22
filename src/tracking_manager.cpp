@@ -12,9 +12,16 @@ namespace cluster_tracker
 
     }
 
-    void TrackingManager::trackObject()
+    void TrackingManager::trackObject(pcl::PCLPointCloud2::Ptr whole_input_cloud)
     {
-
+        pcl::PointCloud<RefPointType>::Ptr temp_cloud(new pcl::PointCloud<RefPointType>);
+        pcl::fromPCLPointCloud2(*whole_input_cloud,*temp_cloud);
+        for(auto tracker_itr=tracker_ptrs_.begin(); tracker_itr!=tracker_ptrs_.end(); tracker_itr++)
+        {
+            std::shared_ptr<cluster_tracker::TrackerInstance> tracker_ptr = *tracker_itr;
+            tracker_ptr->trackObject(temp_cloud);
+        }
+        return;
     }
 
     void TrackingManager::updateConfig(cluster_tracker::ClusterTrackerConfig config)

@@ -6,6 +6,7 @@ namespace cluster_tracker
     TrackerInstance::TrackerInstance(int num_tracking_threads,pcl::PointCloud<RefPointType> cluster, vision_msgs::Detection3D detection)
     {
         tracking_results_ = boost::circular_buffer<vision_msgs::Detection3D>(10);
+        tracking_clouds_ = boost::circular_buffer<pcl::PointCloud<RefPointType>::Ptr>(10);
         // transform pointcloud
         Eigen::Vector4f c;
         Eigen::Affine3f trans = Eigen::Affine3f::Identity();
@@ -58,14 +59,31 @@ namespace cluster_tracker
         return;
     }
 
-    void TrackerInstance::trackObject(pcl::PCLPointCloud2::Ptr cloud)
+    void TrackerInstance::trackObject(pcl::PointCloud<RefPointType>::Ptr cloud)
     {
+        pcl::ApproximateVoxelGrid<RefPointType> grid;
+        grid.setLeafSize(static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size),
+            static_cast<float>(config_.downsample_grid_size));
+        grid.setInputCloud(cloud);
+        grid.filter(*cloud);
+        tracker_.setInputCloud(cloud);
+        tracker_.compute();
+        ParticleT result = tracker_.getResult();
+        pcl::PointCloud<RefPointType>::Ptr result_cloud(new pcl::PointCloud<RefPointType>());
+        pcl::transformPointCloud<RefPointType>(*(tracker_.getReferenceCloud()), *result_cloud, tracker_.toEigenMatrix(result));
+        tracking_clouds_.push_back(result_cloud);
         return;
     }
 
     boost::optional<double> TrackerInstance::getBboxMatchingCost(pcl::PointCloud<RefPointType> cluster,vision_msgs::Detection3D detection)
     {
-        double ret;
+        ROS_ASSERT(tracking_results_.size() == tracking_clouds_.size());
+        if(tracking_results_.size()==0)
+        {
+            return boost::none;
+        }
+        double ret = getPointCloudMatchingCost(*tracking_clouds_[tracking_clouds_.size()-1],cluster);
         return ret;
     }
 
@@ -75,17 +93,17 @@ namespace cluster_tracker
         {
             return 1.0;
         }
-        pcl::SegmentDifferences<RefPointType> impl_;
+        pcl::SegmentDifferences<RefPointType> segment_difference;
         pcl::PointCloud<RefPointType>::ConstPtr pc0_ptr(&pc0);
         pcl::PointCloud<RefPointType>::ConstPtr pc1_ptr(&pc1);
-        impl_.setInputCloud(pc0_ptr);
-        impl_.setTargetCloud(pc1_ptr);
+        segment_difference.setInputCloud(pc0_ptr);
+        segment_difference.setTargetCloud(pc1_ptr);
         pcl::PointCloud<RefPointType> output_pc0;
-        impl_.segment(output_pc0);
-        impl_.setInputCloud(pc1_ptr);
-        impl_.setTargetCloud(pc0_ptr);
+        segment_difference.segment(output_pc0);
+        segment_difference.setInputCloud(pc1_ptr);
+        segment_difference.setTargetCloud(pc0_ptr);
         pcl::PointCloud<RefPointType> output_pc1;
-        impl_.segment(output_pc1);
+        segment_difference.segment(output_pc1);
         double ratio = 1.0-((double)output_pc0.points.size()/(double)pc0_ptr->points.size()+(double)output_pc1.points.size()/(double)pc1_ptr->points.size())*0.5;
         return ratio;
     }
