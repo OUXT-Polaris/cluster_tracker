@@ -10,9 +10,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>message_filters</build_depend>
   <build_depend>nodelet</build_depend>
-  <build_depend>pcl_ros</build_depend>
   <build_depend>pluginlib</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
@@ -23,10 +21,9 @@
   <build_depend>hungarian_solver</build_depend>
   <build_depend>quaternion_operation</build_depend>
   <build_depend>jsk_rviz_plugins</build_depend>
+  <build_depend>geometry_msgs_data_buffer</build_depend>
   <build_export_depend>dynamic_reconfigure</build_export_depend>
-  <build_export_depend>message_filters</build_export_depend>
   <build_export_depend>nodelet</build_export_depend>
-  <build_export_depend>pcl_ros</build_export_depend>
   <build_export_depend>pluginlib</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
@@ -37,10 +34,9 @@
   <build_export_depend>hungarian_solver</build_export_depend>
   <build_export_depend>quaternion_operation</build_export_depend>
   <build_export_depend>jsk_rviz_plugins</build_export_depend>
+  <build_export_depend>geometry_msgs_data_buffer</build_export_depend>
   <exec_depend>dynamic_reconfigure</exec_depend>
-  <exec_depend>message_filters</exec_depend>
   <exec_depend>nodelet</exec_depend>
-  <exec_depend>pcl_ros</exec_depend>
   <exec_depend>pluginlib</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
@@ -51,6 +47,7 @@
   <exec_depend>hungarian_solver</exec_depend>
   <exec_depend>quaternion_operation</exec_depend>
   <exec_depend>jsk_rviz_plugins</exec_depend>
+  <exec_depend>geometry_msgs_data_buffer</exec_depend>
   <!-- The export tag contains other, unspecified, tags -->
   <export>
     <!-- Other tools can request additional information be placed here -->
